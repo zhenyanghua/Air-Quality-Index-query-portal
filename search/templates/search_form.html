@@ -1,0 +1,124 @@
+{# search/templates/search_form.html #}
+{% load render_table from django_tables2 %}
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://maps.cga.harvard.edu/images/CGA.png">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{ STATIC_URL }}django_tables2/themes/paleblue/css/screen.css" />
+    
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}scripts/jquery.datetimepicker.css"/ >
+    <script src="{{ STATIC_URL }}scripts/jquery.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.datetimepicker.js"></script>
+    
+    <link href="{{ STATIC_URL }}scripts/style.css" rel="stylesheet" type="text/css">
+    <title>China AQI Engine</title>
+  
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header_container"><a href={% url 'index' %}><span class="header">China Air Quality Index Search Engine</span></a></div>
+        <div id="search_container">
+            <div class="search-controls">
+                <div class="search-title">Search Station: </div>
+                <form action='/search/st/' method='get'>
+                    Province/City: <input type="text" name="city"/>
+                    <input id="searchStation" type="submit" value="List stations"/>
+                </form>
+            </div>
+            <div class="search-controls">
+                <div class="search-title">Search One Hour AQI: </div>
+                <form action='/search/aqi/' method='get'>
+                    Station: <input type="text" name="st"/>
+                    Date and time: <input id="datetimepicker" class="dtpicker" type="text" name='dt'>
+                    <script>
+                        $('#datetimepicker').datetimepicker({
+                            format:'YmdH0000'
+                        });
+                    </script>
+                    <input id="searchAQI" type="submit" value="Search"/>
+                    <input type="reset" value="Reset"/>
+                </form>
+            </div>
+            <div class="search-controls">
+                <div class="search-title">Search Multiple Days AQI: </div>
+                <form action='/search/aqis/' method='get'>
+                    Station: <input type="text" name="sts"/>
+                    From: <input id="datetimepickerFrom" class="dtpicker" type="text" name='dtF'>
+                    To: <input id="datetimepickerTo" class="dtpicker" type="text" name='dtT'>
+                    <script>
+                        $('#datetimepickerFrom').datetimepicker({
+                            format:'YmdH0000'
+                        });
+                        $('#datetimepickerTo').datetimepicker({
+                            format:'YmdH0000'
+                        });
+                    </script>
+                    <input id="searchAQIs" type="submit" value="Search"/>
+                    <input type="reset" value="Reset"/>
+                </form>
+            </div>
+        </div>
+        <div id="tip_container">
+            <div class="tip-controls">
+                <div class="tip-cell">
+                    Enter a province/city name (Romanized pinyin) to see all the monitoring stations in that province/city.<br>
+                    <span class="highlight">e.g. Beijing; Guangdong</span> *If province returns nothing, try city.
+                </div>
+            </div>
+            <div class="tip-controls">
+                <div class="tip-cell">
+                    You may leave Station blank and pick a date and time to see air quality index for all the stations at a certain time.
+                    <span class="highlight">Or</span> just enter a station and see all the index for that station.
+                </div>
+            </div>
+            <div class="tip-controls">
+                <div class="tip-cell">
+                    You may leave Station blank and pick two dates to see all the air quality index for all the stations in that period.
+                    <span class="highlight">Or</span> enter a station and see its index in the period.
+                </div>
+            </div>
+        </div>
+        <div id="note">
+            <h3>INTRODUCTION</h3>
+            <p>The US embassy in Beijing regularly posts automated air quality measurements at @beijingair on Twitter.
+            On 18 November 2010, the feed described the PM2.5 measurement as "crazy bad" after registering a reading
+            in excess of 500 for the first time. This description was later changed to "beyond index", a level which
+            recurred in February, October, and December 2011.
+            (source: <a href="http://en.wikipedia.org/wiki/Pollution_in_China#Air_pollution" target="_blank"><span class="hightlight highlight-anchor">Pollution in China</span></a>, wikipedia.org)</p>
+            <p>In June 2012, following strongly divergent disclosures of particulate levels between the Observatory and
+            the US Embassy, Chinese authorities asked foreign consulates to stop publishing "inaccurate and unlawful"
+            data. Since then, more and more organizations started setting up their PM2.5 monitoring stations across China.
+            aqicn.org as part of waqi.info, has been posting hourly air quality index data in China to the public.</p>
+            <p>China Air Quality Index (AQI) Search Engine is developed by and hosted at the Center for Geographic Analysis
+            at Harvard University, to retrieve as many air quality measurements as possible from the major sources and re-organize
+            the data for environment research uses. </p>
+            <p>Data available on this site has been collected since <span class="highlight highlight-white-bg">February 7, 2014.</span></p>
+            <p>The data is made available for public use as provided by the owners and operators of the monitoring equipment,
+            and presented by waqi.info and aqicn.org websites. This collection of data represents only a sampling of the air
+            quality measurements recorded at the sources. It is provided with no warranty <span class="highlight-bold">
+            *for academic, non-commercial use only*</span>
+            and with the sole intention of contributing data to scientific analysis by anyone who is interested in the public
+            health consequences of air pollution.</p>
+        </div>
+        <div id="footer_main" class="footer" >
+            <span class="footer-text">China AQI Search Engine is developed and hosted by the
+            <a href="http://gis.harvard.edu" target="_blank">Center for Geographic Analysis</a>
+            at <a href="http://www.harvard.edu" target="_blank">Harvard University</a>.<br>
+             <a href="mailto:zhua@fas.harvard.edu">Contact us</a> | 
+             Copyright 2014 &copy The President and Fellows of Harvard College</span>
+        </div>
+    </div>
+    
+    
+    <script>
+        $(function(){
+            {% if alert %}
+                alert('{{alert}}');
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

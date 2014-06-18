@@ -1,0 +1,153 @@
+{# search/templates/search_results.html #}
+{% load render_table from django_tables2 %}
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://maps.cga.harvard.edu/images/CGA.png">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{ STATIC_URL }}django_tables2/themes/paleblue/css/screen.css" />
+    
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}scripts/jquery.datetimepicker.css"/ >
+    <script src="{{ STATIC_URL }}scripts/jquery.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.datetimepicker.js"></script>
+    
+    <link href="{{ STATIC_URL }}scripts/style.css" rel="stylesheet" type="text/css">
+    <title>China AQI Engine</title>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header_container"><a href={% url 'index' %}><span class="header">China Air Quality Index Search Engine</span></a></div>
+        <div id="search_container">
+            <div class="search-controls">
+                <div class="search-title">Search Station: </div>
+                <form action='/search/st/' method='get'>
+                    Province/City: <input type="text" name="city" value='{{city}}'/>
+                    <input id="searchStation" type="submit" value="List stations"/>
+                </form>
+            </div>
+            <div class="search-controls">
+                <div class="search-title">Search One Hour AQI: </div>
+                <form action='/search/aqi/' method='get'>
+                    Station: <input type="text" name="st" value='{{st}}'/>
+                    Date and time: <input id="datetimepicker" class="dtpicker" type="text" name='dt' value={{dt}}>
+                    <script>
+                        $('#datetimepicker').datetimepicker({
+                            format:'YmdH0000'
+                        });
+                    </script>
+                    <input id="searchAQI" type="submit" value="Search"/>
+                    <input id="resetAQI" type="button" value="Reset"/>
+                    <script>
+                        $("#resetAQI").click(function(){
+                           $('[name="st"]').val("");
+                           $('[name="dt"]').val("");
+                        });
+                    </script>
+                </form>
+            </div>
+            <div class="search-controls">
+                <div class="search-title">Search Multiple Days AQI: </div>
+                <form action='/search/aqis/' method='get'>
+                    Station: <input type="text" name="sts" value='{{sts}}'/>
+                    From: <input id="datetimepickerFrom" class="dtpicker" type="text" name='dtF' value={{dtF}}>
+                    To: <input id="datetimepickerTo" class="dtpicker" type="text" name='dtT' value={{dtT}}>
+                    <script>
+                        $('#datetimepickerFrom').datetimepicker({
+                            format:'YmdH0000'
+                        });
+                        $('#datetimepickerTo').datetimepicker({
+                            format:'YmdH0000'
+                        });
+                    </script>
+                    <input id="searchAQIs" type="submit" value="Search"/>
+                    <input id="resetAQIs" type="button" value="Reset"/>
+                    <script>
+                        $("#resetAQIs").click(function(){
+                           $('[name="sts"]').val("");
+                           $('[name="dtF"]').val("");
+                           $('[name="dtT"]').val("");
+                        });
+                    </script>
+                </form>
+            </div>
+        </div>
+        <div id="tip_container">
+            <div class="tip-controls">
+                <div class="tip-cell">
+                    Enter a province/city name (Romanized pinyin) to see all the monitoring stations in that province/city.<br>
+                    <span class="highlight">e.g. Beijing; Guangdong</span> *If province returns nothing, try city.
+                </div>
+            </div>
+            <div class="tip-controls">
+                <div class="tip-cell">
+                    You may leave Station blank and pick a date and time to see air quality index for all the stations at a certain time.
+                    <span class="highlight">Or</span> just enter a station and see all the index for that station.
+                </div>
+            </div>
+            <div class="tip-controls">
+                <div class="tip-cell">
+                    You may leave Station blank and pick two dates to see all the air quality index for all the stations in that period.
+                    <span class="highlight">Or</span> enter a station and see its index in the period.
+                </div>
+            </div>
+        </div>
+        <div id="export_container">
+            <!--<form action="/search/aqi-export/" method='get'>
+                <input id='exp2csv' type="submit" value="Export To CSV"/>    
+            </form>-->
+        </div>
+        <div id="results_container">
+            {% if location %}
+                {% render_table location %}
+            {% elif aqi%}
+                {% render_table aqi %}
+            {% elif aqis%}
+                {% render_table aqis %}
+            {% endif %}
+        </div>
+        <script>
+            $(function(){
+                $("img[title=\"CSV Report\"]").css({
+                    "position":"absolute",
+                    "top":"-40px"});
+                $("img[title=\"XLS Report\"]").css({
+                    "position":"absolute",
+                    "top":"-40px",
+                    "left":"40px"});
+                
+                var footer_top=$("#results_container").position().top+$("#results_container").height();
+                if ((footer_top+$("div.footer").height())<$(document).height()) {
+                    footer_top=$(document).height()-$("div.footer").height();
+                }else{
+                    footer_top+=10;
+                }
+                $(".footer").css({
+                    "position":"absolute",
+                    "top":footer_top,
+                    "left": "0px",
+                    "right":"0px",
+                    "height": "70px",
+                    "background-color": "#000",
+                    "color": "#FFF",
+                    "z-index": "999",
+                    "padding-left": "7px",
+                    "display": "table",
+                    "text-align": "center"
+                })
+            });
+            
+        </script>
+        
+        <div id="footer_result" class="footer">
+            <span class="footer-text">China AQI Search Engine is developed and hosted by the
+            <a href="http://gis.harvard.edu" target="_blank">Center for Geographic Analysis</a>
+            at <a href="http://www.harvard.edu" target="_blank">Harvard University</a>.<br>
+             <a href="mailto:zhua@fas.harvard.edu">Contact us</a> | 
+             Copyright 2014 &copy The President and Fellows of Harvard College</span>
+        </div>
+        
+    </div>
+</body>
+</html>
